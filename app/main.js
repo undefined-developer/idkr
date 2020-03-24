@@ -17,7 +17,6 @@ const DEBUG = Boolean(argv.debug || config.get('debug')),
 
  app.commandLine.appendSwitch('ignore-gpu-blacklist')
  if (os.cpus()[0].model.includes("AMD")) app.commandLine.appendSwitch("enable-zero-copy");
-
 if (config.get('disableFrameRateLimit', true)) app.commandLine.appendSwitch('disable-frame-rate-limit')  app.commandLine.appendSwitch('disable-gpu-vsync')
 let angleBackend = config.get('angleBackend', 'default'),
 	colorProfile = config.get('colorProfile', 'default')
