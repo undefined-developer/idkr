@@ -14,11 +14,11 @@ const config = new Store()
 const DEBUG = Boolean(argv.debug || config.get('debug')),
 	AUTO_UPDATE = argv.update || config.get('autoUpdate', 'download')
 
-// app.commandLine.appendSwitch('disable-gpu-vsync')
-// app.commandLine.appendSwitch('ignore-gpu-blacklist')
-// app.commandLine.appendSwitch('enable-zero-copy')
-// app.commandLine.appendSwitch('enable-webgl2-compute-context')
-if (config.get('disableFrameRateLimit', true)) app.commandLine.appendSwitch('disable-frame-rate-limit')
+
+ app.commandLine.appendSwitch('ignore-gpu-blacklist')
+ if (os.cpus()[0].model.includes("AMD")) app.commandLine.appendSwitch("enable-zero-copy");
+
+if (config.get('disableFrameRateLimit', true)) app.commandLine.appendSwitch('disable-frame-rate-limit')  app.commandLine.appendSwitch('disable-gpu-vsync')
 let angleBackend = config.get('angleBackend', 'default'),
 	colorProfile = config.get('colorProfile', 'default')
 if (angleBackend != 'default') app.commandLine.appendSwitch('use-angle', angleBackend)
@@ -73,7 +73,29 @@ function validateDocuments(structure, prefix = '') {
 		if (value != null) validateDocuments(value, prefix + key)
 	}
 }
-
+if(process.platform == "darwin") {
+    var template = [{
+        label: "Application",
+        submenu: [
+            { label: "About Application", selector: "orderFrontStandardAboutPanel:" },
+            { type: "separator" },
+            { label: "Quit", accelerator: "Command+Q", click: function() { app.quit(); }}
+        ]}, {
+        label: "Edit",
+        submenu: [
+            { label: "Undo", accelerator: "CmdOrCtrl+Z", selector: "undo:" },
+            { label: "Redo", accelerator: "Shift+CmdOrCtrl+Z", selector: "redo:" },
+            { type: "separator" },
+            { label: "Cut", accelerator: "CmdOrCtrl+X", selector: "cut:" },
+            { label: "Copy", accelerator: "CmdOrCtrl+C", selector: "copy:" },
+            { label: "Paste", accelerator: "CmdOrCtrl+V", selector: "paste:" },
+            { label: "Select All", accelerator: "CmdOrCtrl+A", selector: "selectAll:" }
+        ]}
+    ];
+    Menu.setApplicationMenu(Menu.buildFromTemplate(template));
+} else {
+    Menu.setApplicationMenu(null);
+}
 function setupWindow(win, isWeb) {
 	let contents = win.webContents
 
