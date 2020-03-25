@@ -6,15 +6,23 @@ const config = new Store()
 let settingsWindow = null
 
 document.addEventListener('DOMContentLoaded', () => {
-	const requestAnimFrameOrig = requestAnimFrame
+	let windowsCheck = function() {
+	if (window.hasOwnProperty("windows")) {
+		fpsLimit();
+		} else setTimeout(() => windowsCheck(), 500)
+	}
+windowsCheck();
+		function fpsLimit() {
+		const requestAnimFrameOrig = requestAnimFrame
 			let lastTime = 0
 			requestAnimFrame = function () {
-				if (clientUtil && clientUtil.settings.fpsLimit.val > 0) {
-					for (let i = 0; i < Number.MAX_SAFE_INTEGER && performance.now() - lastTime < 1000 / clientUtil.settings.fpsLimit.val; i++) { }
+				if (clientUtil && config.get('fpsLimit') > 0) {
+					for (let i = 0; i < Number.MAX_SAFE_INTEGER && performance.now() - lastTime < 1000 / config.get('fpsLimit'); i++) { }
 					lastTime = performance.now()
 				}
 				requestAnimFrameOrig(...arguments)
 			}
+	}
 	let windowsObserver = new MutationObserver(() => {
 		windowsObserver.disconnect()
 		settingsWindow = windows[0]
@@ -54,7 +62,7 @@ window.clientUtil = {
 			val: true,
 			html: function () { return clientUtil.genCSettingsHTML(this) }
 		},
-		disableFrameRateLimit: {
+		fpsLimit: {
 			name: 'FPS Limit',
 			id: 'fpsLimit',
 			cat: 'Performance',
