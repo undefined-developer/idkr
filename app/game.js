@@ -6,6 +6,15 @@ const config = new Store()
 let settingsWindow = null
 
 document.addEventListener('DOMContentLoaded', () => {
+	const requestAnimFrameOrig = requestAnimFrame
+			let lastTime = 0
+			requestAnimFrame = function () {
+				if (clientUtil && clientUtil.settings.fpsLimit.val > 0) {
+					for (let i = 0; i < Number.MAX_SAFE_INTEGER && performance.now() - lastTime < 1000 / clientUtil.settings.fpsLimit.val; i++) { }
+					lastTime = performance.now()
+				}
+				requestAnimFrameOrig(...arguments)
+			}
 	let windowsObserver = new MutationObserver(() => {
 		windowsObserver.disconnect()
 		settingsWindow = windows[0]
@@ -43,6 +52,14 @@ window.clientUtil = {
 			cat: 'Performance',
 			type: 'checkbox',
 			val: true,
+			html: function () { return clientUtil.genCSettingsHTML(this) }
+		},
+		disableFrameRateLimit: {
+			name: 'FPS Limit',
+			id: 'fpsLimit',
+			cat: 'Performance',
+			type: 'slider',
+			val: 0,
 			html: function () { return clientUtil.genCSettingsHTML(this) }
 		},
 		angleBackend: {
